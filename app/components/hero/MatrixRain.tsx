@@ -30,9 +30,6 @@ export default function MatrixRain() {
         }
         window.addEventListener('mousemove', handleMouseMove)
 
-        // Paramètres
-        const fontSize = 14
-
         // Palette de couleurs FLUO INTENSES
         const colors = [
             '#00ffff',   // Cyan néon
@@ -50,6 +47,7 @@ export default function MatrixRain() {
             speed: number
             color: string
             revealedLetters: number
+            fontSize: number
         }
 
         const drops: Drop[] = []
@@ -58,13 +56,16 @@ export default function MatrixRain() {
         // Fonction pour créer une nouvelle drop
         const createDrop = () => {
             const command = codeSnippets.commands[Math.floor(Math.random() * codeSnippets.commands.length)]
+            const randomFontSize = Math.floor(Math.random() * 10) + 8 // Entre 8px et 18px
+            
             return {
                 x: Math.random() * (canvas.width - 200),
-                y: -command.length * fontSize,
+                y: -command.length * randomFontSize,
                 text: command,
                 speed: Math.random() * 1 + 0.5,
                 color: colors[Math.floor(Math.random() * colors.length)],
-                revealedLetters: 0
+                revealedLetters: 0,
+                fontSize: randomFontSize
             }
         }
 
@@ -81,12 +82,13 @@ export default function MatrixRain() {
             // Clear complet
             ctx.clearRect(0, 0, canvas.width, canvas.height)
 
-            ctx.font = `${fontSize}px "Courier New", monospace`
-
             // Dessiner chaque drop
             for (let i = drops.length - 1; i >= 0; i--) {
                 const drop = drops[i]
                 const command = drop.text
+
+                // Définir la font pour cette drop
+                ctx.font = `${drop.fontSize}px "Courier New", monospace`
 
                 // Révéler progressivement les lettres
                 if (frameCount % 3 === 0 && drop.revealedLetters < command.length) {
@@ -97,10 +99,10 @@ export default function MatrixRain() {
                 const startIndex = Math.max(0, command.length - drop.revealedLetters)
                 for (let j = startIndex; j < command.length; j++) {
                     const letterX = drop.x
-                    const letterY = drop.y + (j * fontSize)
+                    const letterY = drop.y + (j * drop.fontSize)
 
                     // Ne dessiner que si visible à l'écran
-                    if (letterY > -fontSize && letterY < canvas.height) {
+                    if (letterY > -drop.fontSize && letterY < canvas.height) {
                         // Calculer distance avec la souris
                         const distanceToMouse = Math.sqrt(
                             (letterX - mouseRef.current.x) ** 2 +
@@ -123,9 +125,9 @@ export default function MatrixRain() {
 
                             // Scale up + rotation
                             ctx.translate(letterX, letterY)
-                            const scale = 1 + (hoverIntensity * 0.5) // Grossit de 50%
+                            const scale = 1 + (hoverIntensity * 0.5)
                             ctx.scale(scale, scale)
-                            ctx.rotate(hoverIntensity * 0.2) // Légère rotation
+                            ctx.rotate(hoverIntensity * 0.2)
 
                             // Mega glow
                             ctx.fillStyle = drop.color
@@ -147,17 +149,6 @@ export default function MatrixRain() {
                             ctx.fillStyle = `rgba(${r}, ${g}, ${b}, ${brightness})`
                             ctx.fillText(command[command.length - 1 - j], letterX, letterY)
                         }
-
-                        ctx.shadowColor = drop.color
-
-                        // Couleur avec opacity
-                        const hexColor = drop.color
-                        const r = parseInt(hexColor.slice(1, 3), 16)
-                        const g = parseInt(hexColor.slice(3, 5), 16)
-                        const b = parseInt(hexColor.slice(5, 7), 16)
-
-                        ctx.fillStyle = `rgba(${r}, ${g}, ${b}, ${brightness})`
-                        ctx.fillText(command[command.length - 1 - j], letterX, letterY)
                     }
                 }
 
@@ -201,6 +192,7 @@ export default function MatrixRain() {
         <canvas
             ref={canvasRef}
             className="absolute inset-0 z-10"
+            style={{ pointerEvents: 'none' }}
         />
     )
 }

@@ -2,6 +2,7 @@
 import MatrixRain from './MatrixRain'
 import ThreeBackground from './ThreeBackground'
 import TechLogos from './TechLogos'
+import HeroText from './HeroText'
 
 export default function Hero() {
   return (
@@ -14,23 +15,10 @@ export default function Hero() {
     >
       <MatrixRain />
       <ThreeBackground />
-      
-      {/* Couche 3 : Logos tech */}
       <TechLogos />
-
-      {/* Couche 4 : Texte */}
-      <div className="absolute inset-0 z-40 flex items-center justify-center pointer-events-none">
-        <h1 
-          id="hero-text"
-          className="text-center font-bold leading-none text-foreground"
-          style={{
-            fontSize: 'clamp(3rem, 12vw, 10rem)',
-          }}
-        >
-          <div>Gilles</div>
-          <div>Marchesse</div>
-        </h1>
-      </div>
+      
+      {/* Remplacer l'ancien texte par le nouveau composant */}
+      <HeroText />
     </section>
   )
 }
