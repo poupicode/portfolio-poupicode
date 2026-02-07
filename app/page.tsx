@@ -1,22 +1,14 @@
+import Hero from './components/hero/Hero'
+
 export default function Home() {
   return (
-    <main className="min-h-screen flex items-center justify-center">
-      <div className="text-center">
-        <h1 className="text-6xl font-bold mb-4">
-          Portfolio Test - cicd aussi???
-        </h1>
-        <p className="text-xl text-muted">
-          Le setup fonctionne ! ✅
-        </p>
-        <div className="mt-8 space-y-2">
-          <div className="text-sm">
-            <span className="text-primary">Primary color</span>
-          </div>
-          <div className="text-sm">
-            <span className="text-secondary">Secondary color</span>
-          </div>
-        </div>
-      </div>
+    <main className="bg-background overflow-x-hidden">
+      <Hero />
+
+      {/* Section de test pour le scroll */}
+      <section className="h-screen flex items-center justify-center bg-accent">
+        <h2 className="text-4xl">Section suivante (test scroll)</h2>
+      </section>
     </main>
-  );
+  )
 }

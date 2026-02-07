@@ -2,6 +2,10 @@
 @tailwind components;
 @tailwind utilities;
 
+body {
+  overflow-x: hidden;
+}
+
 :root {
   /* Couleurs de base - À MODIFIER FACILEMENT */
   --background: #0a0a0a;
@@ -12,10 +16,26 @@
   --muted: #666666;
 }
 
+/* Fond dégradé sombre violet/bleu */
+body {
+  background: linear-gradient(
+    135deg,
+    #0a0a14 0%,
+    /* Noir bleuté très sombre */ #1a0b2e 25%,
+    /* Violet très sombre */ #0f0820 50%,
+    /* Noir violacé */ #050a1e 75%,
+    /* Bleu marine très sombre */ #0a0a14 100% /* Retour au noir bleuté */
+  );
+  background-attachment: fixed; /* Le dégradé reste fixe au scroll */
+  min-height: 100vh;
+}
+
 @layer base {
   body {
     @apply bg-background text-foreground;
-    font-feature-settings: "rlig" 1, "calt" 1;
+    font-feature-settings:
+      "rlig" 1,
+      "calt" 1;
   }
 }
 
