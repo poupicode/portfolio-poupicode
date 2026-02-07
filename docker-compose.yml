@@ -1,0 +1,16 @@
+version: '3.8'
+
+services:
+  portfolio:
+    build: .
+    container_name: portfolio
+    restart: unless-stopped
+    environment:
+      - NODE_ENV=production
+      - PORT=3000
+    networks:
+      - npm_network
+
+networks:
+  npm_network:
+    external: true
