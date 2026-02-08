@@ -7,6 +7,7 @@ export default function TechLogos() {
     const [mounted, setMounted] = useState(false)
     const mouseRef = useRef({ x: 0, y: 0 })
     const animationsRef = useRef<Map<HTMLElement, gsap.core.Tween[]>>(new Map())
+    const isMobile = typeof window !== 'undefined' && window.innerWidth < 768
 
     const logos = [
         { name: 'React', svg: '/images/hero/react-svgrepo-com.svg', color: '#61dafb' },
@@ -16,7 +17,13 @@ export default function TechLogos() {
         { name: 'SQL', svg: '/images/hero/sql-svgrepo-com.svg', color: '#FFDB43' },
     ]
 
-    const positions = [
+    const positions = isMobile ? [
+        { left: '5%', top: '12%' },
+        { left: '3%', top: '88%' },
+        { right: '5%', top: '8%' },
+        { right: '3%', top: '50%' },
+        { right: '5%', top: '92%' },
+    ] : [
         { left: '18%', top: '20%' },
         { left: '9%', top: '65%' },
         { right: '18%', top: '15%' },
@@ -135,8 +142,10 @@ export default function TechLogos() {
                         height: 'clamp(60px, 10vw, 120px)',
                     }}
                     onMouseEnter={(e) => {
-                        console.log('HOVER !', logo.name)
 
+                        if ('ontouchstart' in window) return
+
+                        console.log('HOVER !', logo.name)
 
                         // Marquer comme hovered
                         e.currentTarget.classList.add('hovered')
@@ -161,6 +170,8 @@ export default function TechLogos() {
                         e.currentTarget.style.filter = `drop-shadow(0 0 30px ${logo.color}) drop-shadow(0 0 50px ${logo.color})`
                     }}
                     onMouseLeave={(e) => {
+
+                        if ('ontouchstart' in window) return
                         console.log('LEAVE !', logo.name)
 
                         // STOCKER la référence AVANT l'animation

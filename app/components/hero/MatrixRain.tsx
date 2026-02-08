@@ -17,12 +17,17 @@ export default function MatrixRain() {
         const setCanvasSize = () => {
             canvas.width = window.innerWidth
             canvas.height = window.innerHeight
+
+            // Fix mobile : forcer la vraie hauteur viewport
+            if (window.innerHeight < window.innerWidth) return // Desktop
+            canvas.height = Math.max(window.innerHeight, document.documentElement.clientHeight)
         }
         setCanvasSize()
         window.addEventListener('resize', setCanvasSize)
 
         // Suivi de la souris
         const handleMouseMove = (event: MouseEvent) => {
+            if ('ontouchstart' in window) return
             mouseRef.current = {
                 x: event.clientX,
                 y: event.clientY
@@ -57,7 +62,7 @@ export default function MatrixRain() {
         const createDrop = () => {
             const command = codeSnippets.commands[Math.floor(Math.random() * codeSnippets.commands.length)]
             const randomFontSize = Math.floor(Math.random() * 10) + 8 // Entre 8px et 18px
-            
+
             return {
                 x: Math.random() * (canvas.width - 200),
                 y: -command.length * randomFontSize,

@@ -78,7 +78,7 @@ export default function HeroText() {
   }, [])
 
   return (
-    <div 
+    <div
       ref={containerRef}
       className="absolute inset-0 z-40 flex flex-col items-center justify-center gap-0 pointer-events-none"
     >
@@ -97,12 +97,12 @@ export default function HeroText() {
       >
         GILLES
       </div>
-      
+
       <div
         ref={marchesseRef}
         className="hero-line"
         style={{
-          fontSize: 'clamp(5rem, 18vw, 16rem)',
+          fontSize: 'clamp(3rem, 18vw, 16rem)',
           fontWeight: 400,
           color: '#ffffff',
           lineHeight: 0.85,

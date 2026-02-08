@@ -26,6 +26,12 @@ export default function ThreeBackground() {
         renderer.setSize(window.innerWidth, window.innerHeight)
         renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
 
+        const isMobile = 'ontouchstart' in window
+        if (isMobile) {
+            const realHeight = Math.max(window.innerHeight, document.documentElement.clientHeight)
+            renderer.setSize(window.innerWidth, realHeight)
+        }
+
         renderer.domElement.style.position = 'absolute'
         renderer.domElement.style.top = '0'
         renderer.domElement.style.left = '0'
@@ -82,6 +88,7 @@ export default function ThreeBackground() {
         }
 
         const handleMouseMove = (event: MouseEvent) => {
+            if ('ontouchstart' in window) return
             mouseRef.current = {
                 x: (event.clientX / window.innerWidth) * 2 - 1,
                 y: -(event.clientY / window.innerHeight) * 2 + 1
