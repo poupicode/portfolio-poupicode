@@ -9,9 +9,6 @@ export default function Hero() {
     <section
       id="hero"
       className="relative w-full h-screen overflow-hidden"
-      style={{
-        background: 'linear-gradient(135deg, #0a0a14 0%, #1a0b2e 25%, #0f0820 50%, #050a1e 75%, #0a0a14 100%)'
-      }}
     >
       <MatrixRain />
       <ThreeBackground />

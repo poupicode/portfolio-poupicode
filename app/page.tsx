@@ -1,14 +1,13 @@
 import Hero from './components/hero'
+import About from './components/about'
+import Projects from './components/projects'
 
 export default function Home() {
   return (
-    <main className="bg-background overflow-x-hidden">
+    <main className="overflow-x-hidden">
       <Hero />
-
-      {/* Section de test pour le scroll */}
-      {/* <section className="h-screen flex items-center justify-center bg-accent">
-        <h2 className="text-4xl">Section suivante (test scroll)</h2>
-      </section> */}
+      <About />
+      <Projects />
     </main>
   )
 }

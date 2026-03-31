@@ -60,10 +60,16 @@ export default function HeroText() {
       '-=0.8' // Overlap pour que ça soit fluide
     )
 
-    // Glow subtil qui pulse en boucle
-    tl.to([gillesRef.current, marchesseRef.current],
+    // Glow subtil qui pulse en boucle — adapté au thème
+    const isDark = !window.matchMedia('(prefers-color-scheme: light)').matches ||
+      document.documentElement.getAttribute('data-theme') === 'dark'
+    const glowOn  = isDark ? 'rgba(255,255,255,0.3)' : 'rgba(0,0,0,0.15)'
+    const glowOff = isDark ? 'rgba(255,255,255,0)'   : 'rgba(0,0,0,0)'
+
+    tl.fromTo([gillesRef.current, marchesseRef.current],
+      { textShadow: `0 0 0px ${glowOff}` },
       {
-        textShadow: '0 0 30px rgba(255, 255, 255, 0.3)',
+        textShadow: `0 0 30px ${glowOn}`,
         duration: 2,
         repeat: -1,
         yoyo: true,
@@ -88,7 +94,7 @@ export default function HeroText() {
         style={{
           fontSize: 'clamp(5rem, 18vw, 16rem)',
           fontWeight: 400,
-          color: '#ffffff',
+          color: 'var(--foreground)',
           lineHeight: 0.85,
           textAlign: 'center',
           textTransform: 'uppercase',
@@ -104,7 +110,7 @@ export default function HeroText() {
         style={{
           fontSize: 'clamp(3rem, 18vw, 16rem)',
           fontWeight: 400,
-          color: '#ffffff',
+          color: 'var(--foreground)',
           lineHeight: 0.85,
           textAlign: 'center',
           textTransform: 'uppercase',

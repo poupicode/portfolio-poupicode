@@ -45,6 +45,13 @@ export default function ThreeBackground() {
         raycaster.near = 0.1
         raycaster.far = 1000
 
+        // Lit --foreground dans les CSS vars pour être theme-aware
+        const getParticleColor = (): number => {
+            const hex = getComputedStyle(document.documentElement)
+                .getPropertyValue('--foreground').trim()
+            return parseInt(hex.replace('#', ''), 16)
+        }
+
         const gridSize = 16
         const spacing = 5
         const points: THREE.Mesh[] = []
@@ -57,7 +64,7 @@ export default function ThreeBackground() {
                 const geometry = new THREE.SphereGeometry(0.12, 8, 8)
 
                 const material = new THREE.MeshBasicMaterial({
-                    color: 0xffffff,
+                    color: getParticleColor(),
                     transparent: true,
                     opacity: 0 // Invisible au départ
                 })
@@ -86,6 +93,23 @@ export default function ThreeBackground() {
                 points.push(sphere)
             }
         }
+
+        // Met à jour toutes les particules quand le thème change
+        const updateParticleColors = () => {
+            const color = getParticleColor()
+            points.forEach(point => {
+                (point.material as THREE.MeshBasicMaterial).color.setHex(color)
+                if (point.userData.glow) {
+                    const glowMat = (point.userData.glow as THREE.Mesh).material as THREE.MeshBasicMaterial
+                    glowMat.color.setHex(color)
+                }
+            })
+        }
+        const themeObserver = new MutationObserver(updateParticleColors)
+        themeObserver.observe(document.documentElement, {
+            attributes: true,
+            attributeFilter: ['data-theme'],
+        })
 
         const handleMouseMove = (event: MouseEvent) => {
             if ('ontouchstart' in window) return
@@ -160,7 +184,7 @@ export default function ThreeBackground() {
                     if (!userData.glowAdded) {
                         const glowGeometry = new THREE.SphereGeometry(0.3, 16, 16)
                         const glowMaterial = new THREE.MeshBasicMaterial({
-                            color: 0xffffff,
+                            color: getParticleColor(),
                             transparent: true,
                             opacity: 0,
                             side: THREE.BackSide
@@ -208,6 +232,7 @@ export default function ThreeBackground() {
         renderer.setAnimationLoop(animate)
 
         return () => {
+            themeObserver.disconnect()
             window.removeEventListener('mousemove', handleMouseMove)
             window.removeEventListener('resize', handleResize)
 

@@ -2,70 +2,161 @@
 @tailwind components;
 @tailwind utilities;
 
-body {
-  overflow-x: hidden;
-}
-
+/* ─────────────────────────────────────────────
+   DARK THEME (default)
+   ───────────────────────────────────────────── */
 :root {
-  /* Couleurs de base - À MODIFIER FACILEMENT */
-  --background: #0a0a0a;
-  --foreground: #ffffff;
-  --primary: #00f5ff;
-  --secondary: #7b2cbf;
-  --accent: #1a1a1a;
-  --muted: #666666;
+  /* Semantic colours (Tailwind tokens point here) */
+  --background:  #0a0a0a;
+  --foreground:  #ffffff;
+  --primary:     #00f5ff;
+  --secondary:   #7b2cbf;
+  --accent:      #1a1a1a;
+  --muted:       #666666;
+
+  /* Extended palette */
+  --color-text-secondary: #aaaaaa;
+  --color-border:         rgba(255, 255, 255, 0.08);
+  --color-surface:        rgba(255, 255, 255, 0.03);
+  --color-overlay:        rgba(0, 0, 0, 0.75);
+
+  /* Background gradient stops */
+  --grad-1: #0a0a14;
+  --grad-2: #1a0b2e;
+  --grad-3: #0f0820;
+  --grad-4: #050a1e;
+
+  /* ── Fluid size tokens — desktop base: 1440 px ── */
+  --text-headline:     3.333dvw;   /* ≈ 48px */
+  --text-section:      2.778dvw;   /* ≈ 40px */
+  --text-body:         1.111dvw;   /* ≈ 16px */
+  --text-label:        0.764dvw;   /* ≈ 11px */
+
+  /* ── Fluid spacing tokens ── */
+  --space-x:           6.667dvw;   /* ≈ 96px  */
+  --space-section-y:   6.667dvh;   /* ≈ 64px  */
 }
 
-/* Fond dégradé sombre violet/bleu */
-body {
-  background: linear-gradient(
-    135deg,
-    #0a0a14 0%,
-    /* Noir bleuté très sombre */ #1a0b2e 25%,
-    /* Violet très sombre */ #0f0820 50%,
-    /* Noir violacé */ #050a1e 75%,
-    /* Bleu marine très sombre */ #0a0a14 100% /* Retour au noir bleuté */
-  );
-  background-attachment: fixed; /* Le dégradé reste fixe au scroll */
-  min-height: 100vh;
-}
-
-@layer base {
-  body {
-    @apply bg-background text-foreground;
-    font-feature-settings:
-      "rlig" 1,
-      "calt" 1;
+/* ─────────────────────────────────────────────
+   LIGHT THEME — applied when OS prefers light
+   OR when [data-theme="light"] is set explicitly
+   ───────────────────────────────────────────── */
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme="dark"]) {
+    --background:  #f0f0ee;
+    --foreground:  #0a0a0a;
+    --primary:     #0077aa;
+    --secondary:   #6b1faf;
+    --accent:      #e4e4e0;
+    --muted:       #888888;
+    --color-text-secondary: #555555;
+    --color-border:         rgba(0, 0, 0, 0.08);
+    --color-surface:        rgba(0, 0, 0, 0.03);
+    --color-overlay:        rgba(255, 255, 255, 0.75);
+    --grad-1: #f5f5f0;
+    --grad-2: #eae0f5;
+    --grad-3: #f0e8f8;
+    --grad-4: #e8eef8;
   }
 }
 
-/* Smooth scrolling */
+/* Explicit override (manual toggle) */
+[data-theme="light"] {
+  --background:  #f0f0ee;
+  --foreground:  #0a0a0a;
+  --primary:     #0077aa;
+  --secondary:   #6b1faf;
+  --accent:      #e4e4e0;
+  --muted:       #888888;
+  --color-text-secondary: #555555;
+  --color-border:         rgba(0, 0, 0, 0.08);
+  --color-surface:        rgba(0, 0, 0, 0.03);
+  --color-overlay:        rgba(255, 255, 255, 0.75);
+  --grad-1: #f5f5f0;
+  --grad-2: #eae0f5;
+  --grad-3: #f0e8f8;
+  --grad-4: #e8eef8;
+}
+
+[data-theme="dark"] {
+  --background:  #0a0a0a;
+  --foreground:  #ffffff;
+  --primary:     #00f5ff;
+  --secondary:   #7b2cbf;
+  --accent:      #1a1a1a;
+  --muted:       #666666;
+  --color-text-secondary: #aaaaaa;
+  --color-border:         rgba(255, 255, 255, 0.08);
+  --color-surface:        rgba(255, 255, 255, 0.03);
+  --color-overlay:        rgba(0, 0, 0, 0.75);
+  --grad-1: #0a0a14;
+  --grad-2: #1a0b2e;
+  --grad-3: #0f0820;
+  --grad-4: #050a1e;
+}
+
+/* ─────────────────────────────────────────────
+   MOBILE overrides — base: 390 px
+   ───────────────────────────────────────────── */
+@media (max-width: 768px) {
+  :root {
+    --text-headline:     7.179dvw;   /* ≈ 28px */
+    --text-section:      6.154dvw;   /* ≈ 24px */
+    --text-body:         3.846dvw;   /* ≈ 15px */
+    --text-label:        2.564dvw;   /* ≈ 10px */
+
+    --space-x:           6.154dvw;   /* ≈ 24px */
+    --space-section-y:   3rem;       /* fixed — dvh unreliable with mobile chrome */
+  }
+}
+
+/* ─────────────────────────────────────────────
+   GLOBAL STYLES
+   ───────────────────────────────────────────── */
+body {
+  overflow-x: hidden;
+  background: linear-gradient(
+    135deg,
+    var(--grad-1) 0%,
+    var(--grad-2) 25%,
+    var(--grad-3) 50%,
+    var(--grad-4) 75%,
+    var(--grad-1) 100%
+  );
+  background-attachment: fixed;
+  min-height: 100vh;
+}
+
 html {
   scroll-behavior: smooth;
 }
 
-/* Custom scrollbar */
-::-webkit-scrollbar {
-  width: 8px;
+@layer base {
+  body {
+    @apply text-foreground;
+    font-feature-settings: "rlig" 1, "calt" 1;
+  }
 }
 
-::-webkit-scrollbar-track {
-  background: var(--background);
-}
-
-::-webkit-scrollbar-thumb {
-  background: var(--muted);
-  border-radius: 4px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: var(--primary);
-}
-
-/* Désactiver la sélection de texte pendant les animations */
+/* ─────────────────────────────────────────────
+   UTILITIES
+   ───────────────────────────────────────────── */
 .no-select {
   -webkit-user-select: none;
   -moz-user-select: none;
-  -ms-user-select: none;
   user-select: none;
 }
+
+.scrollbar-none {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.scrollbar-none::-webkit-scrollbar {
+  display: none;
+}
+
+/* Custom scrollbar (desktop) */
+::-webkit-scrollbar       { width: 8px; }
+::-webkit-scrollbar-track { background: var(--background); }
+::-webkit-scrollbar-thumb { background: var(--muted); border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: var(--primary); }

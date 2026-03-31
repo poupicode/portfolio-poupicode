@@ -4,7 +4,6 @@ import codeSnippets from '../../data/code-snippets.json'
 
 export default function MatrixRain() {
     const canvasRef = useRef<HTMLCanvasElement>(null)
-    const mouseRef = useRef({ x: 0, y: 0 })
 
     useEffect(() => {
         const canvas = canvasRef.current
@@ -25,24 +24,35 @@ export default function MatrixRain() {
         setCanvasSize()
         window.addEventListener('resize', setCanvasSize)
 
-        // Suivi de la souris
-        const handleMouseMove = (event: MouseEvent) => {
-            if ('ontouchstart' in window) return
-            mouseRef.current = {
-                x: event.clientX,
-                y: event.clientY
-            }
-        }
-        window.addEventListener('mousemove', handleMouseMove)
+        // IntersectionObserver : arrêter les nouvelles drops quand le hero sort du viewport
+        let heroVisible = true
+        const visibilityObserver = new IntersectionObserver(
+            ([entry]) => { heroVisible = entry.isIntersecting },
+            { threshold: 0.05 }
+        )
+        visibilityObserver.observe(canvas)
 
-        // Palette de couleurs FLUO INTENSES
-        const colors = [
+        // Palettes selon le thème
+        const colorsDark = [
             '#00ffff',   // Cyan néon
             '#9d4edd',   // Violet électrique
             '#ff0080',   // Rose flash
             '#39ff14',   // Vert radioactif
             '#bf00ff',   // Violet fluo
         ]
+        const colorsLight = [
+            '#007799',   // Cyan sombre — 6:1 contrast sur fond clair
+            '#6b1faf',   // Violet profond
+            '#bb0044',   // Carmin
+            '#1a7a00',   // Vert forêt
+            '#880099',   // Violet foncé
+        ]
+        const isLightTheme = () =>
+            document.documentElement.getAttribute('data-theme') === 'light' ||
+            (!document.documentElement.getAttribute('data-theme') &&
+                window.matchMedia('(prefers-color-scheme: light)').matches)
+
+        const colorsRef = { current: isLightTheme() ? colorsLight : colorsDark }
 
         // Structure pour chaque ligne qui tombe
         interface Drop {
@@ -68,7 +78,7 @@ export default function MatrixRain() {
                 y: -command.length * randomFontSize,
                 text: command,
                 speed: Math.random() * 1 + 0.5,
-                color: colors[Math.floor(Math.random() * colors.length)],
+                color: colorsRef.current[Math.floor(Math.random() * colorsRef.current.length)],
                 revealedLetters: 0,
                 fontSize: randomFontSize
             }
@@ -108,52 +118,18 @@ export default function MatrixRain() {
 
                     // Ne dessiner que si visible à l'écran
                     if (letterY > -drop.fontSize && letterY < canvas.height) {
-                        // Calculer distance avec la souris
-                        const distanceToMouse = Math.sqrt(
-                            (letterX - mouseRef.current.x) ** 2 +
-                            (letterY - mouseRef.current.y) ** 2
-                        )
-
-                        // Zone de hover (100 pixels)
-                        const hoverRadius = 100
-                        const isHovered = distanceToMouse < hoverRadius
-
                         // Gradient : fade en haut, lumineux en bas
-                        let brightness = 0.2 + (j / command.length) * 0.8
+                        const brightness = 0.2 + (j / command.length) * 0.8
 
-                        // Si hover, augmenter la luminosité
-                        if (isHovered) {
-                            const hoverIntensity = 1 - (distanceToMouse / hoverRadius)
-                            brightness = 1
+                        ctx.shadowBlur = 10
+                        ctx.shadowColor = drop.color
 
-                            ctx.save()
-
-                            // Scale up + rotation
-                            ctx.translate(letterX, letterY)
-                            const scale = 1 + (hoverIntensity * 0.5)
-                            ctx.scale(scale, scale)
-                            ctx.rotate(hoverIntensity * 0.2)
-
-                            // Mega glow
-                            ctx.fillStyle = drop.color
-                            ctx.shadowBlur = 60
-                            ctx.shadowColor = drop.color
-
-                            // Dessiner au centre après transformation
-                            ctx.fillText(command[command.length - 1 - j], 0, 0)
-
-                            ctx.restore()
-                        } else {
-                            ctx.shadowBlur = 10
-                            ctx.shadowColor = drop.color
-
-                            const hexColor = drop.color
-                            const r = parseInt(hexColor.slice(1, 3), 16)
-                            const g = parseInt(hexColor.slice(3, 5), 16)
-                            const b = parseInt(hexColor.slice(5, 7), 16)
-                            ctx.fillStyle = `rgba(${r}, ${g}, ${b}, ${brightness})`
-                            ctx.fillText(command[command.length - 1 - j], letterX, letterY)
-                        }
+                        const hexColor = drop.color
+                        const r = parseInt(hexColor.slice(1, 3), 16)
+                        const g = parseInt(hexColor.slice(3, 5), 16)
+                        const b = parseInt(hexColor.slice(5, 7), 16)
+                        ctx.fillStyle = `rgba(${r}, ${g}, ${b}, ${brightness})`
+                        ctx.fillText(command[command.length - 1 - j], letterX, letterY)
                     }
                 }
 
@@ -169,15 +145,15 @@ export default function MatrixRain() {
                 }
             }
 
-            // FLUX CONSTANT
-            if (frameCount % 50 === 0) {
+            // FLUX CONSTANT — uniquement si le hero est visible
+            if (frameCount % 50 === 0 && heroVisible) {
                 if (drops.length < 15) {
                     drops.push(createDrop())
                 }
             }
 
             // Garantir un minimum de drops actives
-            if (drops.length < 6) {
+            if (drops.length < 6 && heroVisible) {
                 drops.push(createDrop())
             }
         }
@@ -185,11 +161,24 @@ export default function MatrixRain() {
         // Animation à 60 FPS
         const interval = setInterval(draw, 1000 / 60)
 
+        // Switcher la palette quand le thème change
+        const themeObserver = new MutationObserver(() => {
+            colorsRef.current = isLightTheme() ? colorsLight : colorsDark
+            drops.forEach(drop => {
+                drop.color = colorsRef.current[Math.floor(Math.random() * colorsRef.current.length)]
+            })
+        })
+        themeObserver.observe(document.documentElement, {
+            attributes: true,
+            attributeFilter: ['data-theme'],
+        })
+
         // Cleanup
         return () => {
             clearInterval(interval)
+            themeObserver.disconnect()
+            visibilityObserver.disconnect()
             window.removeEventListener('resize', setCanvasSize)
-            window.removeEventListener('mousemove', handleMouseMove)
         }
     }, [])
 
